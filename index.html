@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>💘 Mitch, will you be my Valentine?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --pink:#ff4fa3;
+      --pink2:#ff86c8;
+      --text:#2f2230;
+      --card:#ffffffcc;
+      --shadow: 0 18px 45px rgba(0,0,0,.18);
+      --soft: 0 10px 25px rgba(0,0,0,.12);
+      --radius: 26px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Baloo 2", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      overflow:hidden;
+      background:#fff3f8;
+    }
+
+    /* Collage background */
+    .collage{
+      position:fixed; inset:0;
+      z-index:0;
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-auto-rows: 20vh;
+      gap: 10px;
+      padding: 12px;
+      filter: saturate(1.05) contrast(1.02);
+      opacity:.38;
+      transform: scale(1.02);
+    }
+    .tile{
+      border-radius: 22px;
+      overflow:hidden;
+      box-shadow: var(--soft);
+      border: 2px solid rgba(255,255,255,.5);
+      position:relative;
+      background:#fff;
+    }
+    .tile img{width:100%; height:100%; object-fit:cover; display:block}
+    .vignette{
+      position:fixed; inset:-2px;
+      background:
+        radial-gradient(900px 600px at 20% 20%, rgba(255,79,163,.35), transparent 60%),
+        radial-gradient(900px 600px at 80% 30%, rgba(255,211,106,.30), transparent 60%),
+        radial-gradient(900px 700px at 40% 95%, rgba(114,243,197,.25), transparent 60%),
+        linear-gradient(135deg, rgba(255,241,246,.88), rgba(255,247,232,.88));
+      z-index:1;
+      pointer-events:none;
+    }
+
+    /* Floating heart ribbon */
+    .ribbon{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:2;
+      overflow:hidden;
+    }
+    .heart{
+      position:absolute;
+      bottom:-40px;
+      font-size: 20px;
+      opacity:.85;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.12));
+      animation: rise linear infinite;
+    }
+    @keyframes rise{
+      to {
+        transform: translateY(-120vh);
+        opacity: 0.05;
+      }
+    }
+
+    /* Main card */
+    .wrap{
+      position:relative;
+      z-index:3;
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding: 18px;
+    }
+    .card{
+      width:min(680px, 100%);
+      background: var(--card);
+      border: 2px solid rgba(255,79,163,.22);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding: 18px 18px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: conic-gradient(from 180deg, rgba(255,79,163,.35), rgba(165,92,255,.25), rgba(114,243,197,.25), rgba(255,211,106,.25), rgba(255,79,163,.35));
+      filter: blur(18px);
+      opacity:.25;
+      z-index:-1;
+    }
+
+    h1{
+      margin: 6px 0 6px;
+      font-size: clamp(28px, 5vw, 52px);
+      letter-spacing: -0.7px;
+      line-height:1.02;
+    }
+    .sub{
+      margin:0 0 14px;
+      font-family:"Patrick Hand", cursive;
+      font-size: clamp(18px, 2.6vw, 26px);
+      opacity:.92;
+    }
+    .msg{
+      background: rgba(255,255,255,.78);
+      border: 2px solid rgba(165,92,255,.16);
+      border-radius: 20px;
+      padding: 14px;
+      box-shadow: var(--soft);
+      font-family:"Patrick Hand", cursive;
+      font-size: 22px;
+      line-height:1.15;
+      white-space: pre-wrap;
+    }
+
+    .actions{
+      margin-top: 14px;
+      position:relative;
+      min-height: 90px;
+      display:flex;
+      gap: 12px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+    .btn{
+      border:0;
+      cursor:pointer;
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-weight: 900;
+      font-size: 18px;
+      box-shadow: 0 14px 25px rgba(0,0,0,.14);
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .14s ease, filter .14s ease;
+    }
+    .btn:active{ transform: translateY(2px) scale(.98); }
+
+    #yesBtn{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#fff;
+      border: 2px solid rgba(255,255,255,.66);
+      transform-origin: left top;
+    }
+    #yesBtn:hover{ filter: brightness(1.03) saturate(1.08); }
+
+    #noBtn{
+      background: linear-gradient(135deg, #ffffff, #fff1f6);
+      color:#6b2752;
+      border: 2px dashed rgba(165,92,255,.35);
+      position: fixed;
+      left: 58vw;
+      top: 56vh;
+      transform-origin:center;
+      z-index: 10;
+    }
+
+    .hint{
+      margin-top: 8px;
+      font-family:"Patrick Hand", cursive;
+      font-size: 18px;
+      opacity:.82;
+    }
+
+    /* YES modal */
+    .overlay{
+      position:fixed; inset:0;
+      z-index:50;
+      display:none;
+      place-items:center;
+      padding: 18px;
+      background: rgba(10,10,18,.55);
+      backdrop-filter: blur(10px);
+    }
+    .overlay.show{ display:grid; }
+    .modal{
+      width:min(720px, 100%);
+      background:#fff;
+      border-radius: 28px;
+      border: 3px solid rgba(255,79,163,.28);
+      box-shadow: 0 30px 90px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .modal .top{
+      padding: 16px 18px 10px;
+      background: linear-gradient(135deg, #fff1f6, #fff7e8);
+      border-bottom: 2px solid rgba(255,79,163,.18);
+    }
+    .modal h2{ margin:0; font-size: 30px; }
+    .modal .body{ padding: 14px 18px 18px; display:grid; gap: 12px; }
+    .big{ font-size: 64px; text-align:center; }
+    .closeRow{ display:flex; justify-content:center; padding: 0 18px 18px; }
+    .closeBtn{ background: linear-gradient(135deg, var(--pink), var(--pink2)); color:#fff; border: 2px solid rgba(255,255,255,.66); }
+
+    @media (max-width:520px){
+      .actions{ min-height:auto; }
+    }
+  
+    .musicRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      margin-top: -6px;
+      margin-bottom: 10px;
+      flex-wrap:wrap;
+    }
+    .musicBtn{
+      border:0;
+      cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 14px;
+      box-shadow: 0 12px 22px rgba(0,0,0,.14);
+      background: rgba(255,255,255,.75);
+      border: 2px solid rgba(255,79,163,.22);
+      color: #5b2046;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .musicBtn:active{ transform: translateY(2px) scale(.98); }
+
+  
+    /* Confetti */
+    .confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index: 60;
+    }
+    .confetti i{
+      position:absolute;
+      width:10px;
+      height:14px;
+      border-radius: 3px;
+      opacity:.95;
+      animation: fall linear forwards;
+    }
+    @keyframes fall{
+      to{ transform: translateY(120vh) rotate(520deg); opacity:.9; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="collage" id="collage"></div>
+  <div class="vignette"></div>
+  <div class="ribbon" id="ribbon"></div>
+
+  <main class="wrap">
+    <section class="card">
+      <h1>Mitch, will you be my Valentine? 💌</h1>
+      <p class="sub">Just a simple question… with a not-so-simple “No” button 😅</p>
+
+      <div class="musicRow">
+        <button class="musicBtn" id="musicBtn">music: off 🎵</button>
+      </div>
+
+      <audio id="audio" preload="auto">
+        <source src="assets/paraluman.mp3" type="audio/mpeg">
+      </audio>
+
+      <div class="msg">Hi Babyyyy, wifeyy! I know that we are together now, and you have been giving me hints on asking you to be my valentines. So here it is po! I lovee youuuu!! And PLEASEEE SAY YESSS Pls plspslpslpslsplspsl</div>
+
+      <div class="actions" id="actions">
+        <button class="btn" id="yesBtn">YES 💕</button>
+        <button class="btn" id="noBtn">NO</button>
+      </div>
+      <div class="hint" id="hint">Tip: try to catch “NO” if you can 😼</div>
+    </section>
+  </main>
+
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="top"><h2>💘</h2></div>
+      <div class="body">
+        <div class="big">😻🎉</div>
+        <div class="msg" style="font-size:24px;">:OO THANK YOU THANK YOU I LOVEEE YOUUU SO MUCHH BABBY!</div>
+      </div>
+      <div class="closeRow">
+        <button class="btn closeBtn" id="closeBtn">close 💗</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PHOTOS = ["assets/img/p01.jpg", "assets/img/p02.jpg", "assets/img/p03.jpg", "assets/img/p04.jpg", "assets/img/p05.jpg", "assets/img/p06.jpg", "assets/img/p07.jpg", "assets/img/p08.jpg", "assets/img/p09.jpg", "assets/img/p10.jpg"];
+
+    // Build collage tiles (repeat to fill)
+    const collage = document.getElementById('collage');
+    const tilesNeeded = 25; // 5x5 grid
+    for(let i=0;i<tilesNeeded;i++){
+      const t = document.createElement('div');
+      t.className = 'tile';
+      const src = PHOTOS[i % PHOTOS.length];
+      t.innerHTML = `<img src="${src}" alt="photo">`;
+      collage.appendChild(t);
+    }
+
+    // Floating heart ribbon
+    const ribbon = document.getElementById('ribbon');
+    const heartEmojis = ["💖","💘","💗","💞","💕"];
+    const heartCount = 18; // good amount, not too many
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+    for(let i=0;i<heartCount;i++){
+      const h = document.createElement('div');
+      h.className = 'heart';
+      h.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+      h.style.left = rand(2, 98) + 'vw';
+      h.style.animationDuration = rand(7.5, 13.5) + 's';
+      h.style.animationDelay = rand(0, 7) + 's';
+      h.style.fontSize = rand(16, 26) + 'px';
+      ribbon.appendChild(h);
+    }
+
+    // Buttons behavior
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn  = document.getElementById('noBtn');
+    const actions = document.getElementById('actions');
+    const hint = document.getElementById('hint');
+    const overlay = document.getElementById('overlay');
+    const closeBtn = document.getElementById('closeBtn');
+
+
+    // Music toggle (note: browsers require a user tap before audio can play)
+    const musicBtn = document.getElementById('musicBtn');
+    const audio = document.getElementById('audio');
+    let musicOn = false;
+
+    async function toggleMusic(){
+      try{
+        if(!musicOn){
+          await audio.play();
+          musicOn = true;
+          musicBtn.textContent = "music: on 🎶";
+        }else{
+          audio.pause();
+          musicOn = false;
+          musicBtn.textContent = "music: off 🎵";
+        }
+      }catch(err){
+        // If autoplay blocked or file missing
+        musicBtn.textContent = "tap again 🎵";
+      }
+    }
+
+    if(musicBtn){
+      musicBtn.addEventListener('click', toggleMusic);
+      // Optional: start music on first YES/NO interaction if user hasn't pressed music yet
+      const kickstart = async ()=>{
+        if(musicOn || !audio) return;
+        try{ await audio.play(); musicOn=true; musicBtn.textContent="music: on 🎶"; }
+        catch(e){}
+        window.removeEventListener('pointerdown', kickstart);
+      };
+      window.addEventListener('pointerdown', kickstart, { once:true });
+    }
+
+
+    let noScale = 1.0;
+    let yesScale = 1.0;
+
+    
+    // --- NO button behavior ---
+    // Moves a little when the cursor gets close.
+    // If clicked: runs around (full screen) + changes size again.
+    let noScale = 1.0;
+    let yesScale = 1.0;
+
+    // Keep track of cursor position (desktop)
+    let cursorX = window.innerWidth * 0.6;
+    let cursorY = window.innerHeight * 0.6;
+
+    window.addEventListener('mousemove', (e)=>{
+      cursorX = e.clientX;
+      cursorY = e.clientY;
+    }, { passive:true });
+
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+
+    function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+    function placeNoRandom(){
+      const rect = noBtn.getBoundingClientRect();
+      const pad = 12;
+      const x = rand(pad, window.innerWidth - rect.width - pad);
+      const y = rand(pad, window.innerHeight - rect.height - pad);
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+    }
+
+    // gentle dodge when cursor approaches
+    function dodgeStep(){
+      const rect = noBtn.getBoundingClientRect();
+      const bx = rect.left + rect.width/2;
+      const by = rect.top  + rect.height/2;
+
+      const dx = bx - cursorX;
+      const dy = by - cursorY;
+      const dist = Math.hypot(dx, dy);
+
+      // distance where it starts reacting
+      const trigger = 220;
+
+      if(dist < trigger){
+        // move away a little (scaled by closeness)
+        const strength = (trigger - dist) / trigger; // 0..1
+        const step = 18 + 40 * strength;
+
+        // normalized direction away from cursor (randomize slightly)
+        const nx = (dx / (dist || 1)) + rand(-0.12, 0.12);
+        const ny = (dy / (dist || 1)) + rand(-0.12, 0.12);
+
+        let newLeft = parseFloat(noBtn.style.left || rect.left) + nx * step;
+        let newTop  = parseFloat(noBtn.style.top  || rect.top ) + ny * step;
+
+        const pad = 10;
+        newLeft = clamp(newLeft, pad, window.innerWidth - rect.width - pad);
+        newTop  = clamp(newTop,  pad, window.innerHeight - rect.height - pad);
+
+        noBtn.style.left = newLeft + "px";
+        noBtn.style.top  = newTop  + "px";
+      }
+
+      requestAnimationFrame(dodgeStep);
+    }
+
+    // running-around chaos after click
+    function runAround(){
+      // random scale up/down
+      const dir = Math.random() < 0.55 ? -1 : 1;
+      noScale = clamp(noScale + dir * rand(0.12, 0.30), 0.08, 2.2);
+      noBtn.style.transform = `scale(${noScale})`;
+
+      // quick random teleport a few times
+      let hops = 0;
+      const hop = ()=>{
+        placeNoRandom();
+        hops++;
+        if(hops < 7) setTimeout(hop, 80);
+      };
+      hop();
+
+      // If NO becomes tiny, boost YES gradually
+      if(noScale <= 0.18){
+        hint.textContent = "Where did “NO” go… 😅";
+        yesScale = clamp(yesScale + 0.14, 1.0, 3.8);
+        yesBtn.style.transform = `scale(${yesScale})`;
+      }else{
+        hint.textContent = "Try again 😼";
+      }
+    }
+
+    // start position
+    placeNoRandom();
+    requestAnimationFrame(dodgeStep);
+
+    // On click, do the full-screen run around again
+    noBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      runAround();
+    });
+
+    window.addEventListener('resize', ()=>{
+      // keep inside viewport
+      const r = noBtn.getBoundingClientRect();
+      const pad = 10;
+      const x = clamp(r.left, pad, window.innerWidth - r.width - pad);
+      const y = clamp(r.top,  pad, window.innerHeight - r.height - pad);
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+    });
+
+    
+    // Confetti burst
+    const confetti = document.getElementById('confetti');
+    function sprinkleConfetti(){
+      if(!confetti) return;
+      confetti.innerHTML = "";
+      const colors = ["#ff4fa3","#ff86c8","#a55cff","#72f3c5","#ffd36a","#ffffff"];
+      const pieces = 140;
+      for(let i=0;i<pieces;i++){
+        const p = document.createElement('i');
+        p.style.left = rand(0,100) + "%";
+        p.style.top  = rand(-10,-2) + "vh";
+        p.style.background = colors[Math.floor(Math.random()*colors.length)];
+        p.style.width = rand(6, 12) + "px";
+        p.style.height = rand(8, 18) + "px";
+        p.style.animationDuration = rand(1.8, 3.4) + "s";
+        p.style.animationDelay = rand(0, 0.35) + "s";
+        p.style.transform = `rotate(${rand(0,360)}deg)`;
+        confetti.appendChild(p);
+      }
+      // cleanup
+      setTimeout(()=>{ if(confetti) confetti.innerHTML=""; }, 4200);
+    }
+
+yesBtn.addEventListener('click', ()=> {
+      sprinkleConfetti();
+      overlay.classList.add('show');
+    });
+    closeBtn.addEventListener('click', ()=> overlay.classList.remove('show'));
+    overlay.addEventListener('click', (e)=>{ if(e.target === overlay) overlay.classList.remove('show'); });
+
+    moveNo();
+    window.addEventListener('resize', moveNo);
+  </script>
+  <div class="confetti" id="confetti"></div>
+</body>
+</html>

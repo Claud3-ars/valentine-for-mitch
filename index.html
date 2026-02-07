@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mitch, will you be my Valentine?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink:#ff4fa3; --pink2:#ff86c8; --text:#2f2230;
+  --card:rgba(255,255,255,.84); --shadow:0 18px 45px rgba(0,0,0,.18);
+  --soft:0 10px 25px rgba(0,0,0,.12);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; font-family:"Baloo 2",system-ui,Arial; color:var(--text); overflow:hidden; background:#fff3f8;}
+
+/* collage */
+.collage{position:fixed; inset:0; z-index:0; display:grid; grid-template-columns:repeat(5,1fr); grid-auto-rows:20vh; gap:10px; padding:12px; opacity:.38;}
+.tile{border-radius:22px; overflow:hidden; box-shadow:var(--soft); border:2px solid rgba(255,255,255,.5); background:#fff;}
+.tile img{width:100%; height:100%; object-fit:cover; display:block;}
+
+.vignette{position:fixed; inset:-2px; z-index:1; pointer-events:none;
+  background:
+    radial-gradient(900px 600px at 20% 20%, rgba(255,79,163,.35), transparent 60%),
+    radial-gradient(900px 600px at 80% 30%, rgba(255,211,106,.30), transparent 60%),
+    radial-gradient(900px 700px at 40% 95%, rgba(114,243,197,.25), transparent 60%),
+    linear-gradient(135deg, rgba(255,241,246,.88), rgba(255,247,232,.88));
+}
+
+/* hearts */
+.ribbon{position:fixed; inset:0; z-index:2; pointer-events:none; overflow:hidden;}
+.heart{position:absolute; bottom:-40px; opacity:.85; filter:drop-shadow(0 8px 14px rgba(0,0,0,.12)); animation:rise linear infinite;}
+@keyframes rise{to{transform:translateY(-120vh); opacity:.05;}}
+
+.wrap{position:relative; z-index:3; height:100%; display:grid; place-items:center; padding:18px;}
+.card{width:min(680px,100%); background:var(--card); border:2px solid rgba(255,79,163,.22); border-radius:26px; box-shadow:var(--shadow); backdrop-filter:blur(10px); padding:18px;}
+h1{margin:6px 0 6px; font-size:clamp(28px,5vw,52px); line-height:1.02;}
+.sub{margin:0 0 10px; font-family:"Patrick Hand",cursive; font-size:clamp(18px,2.6vw,26px); opacity:.92;}
+.msg{background:rgba(255,255,255,.78); border:2px solid rgba(165,92,255,.16); border-radius:20px; padding:14px; box-shadow:var(--soft); font-family:"Patrick Hand",cursive; font-size:22px; line-height:1.15; white-space:pre-wrap;}
+
+.musicRow{display:flex; justify-content:flex-end; margin:8px 0 10px;}
+.musicBtn{border:2px solid rgba(255,79,163,.22); background:rgba(255,255,255,.75); border-radius:16px; padding:10px 12px; font-weight:900; cursor:pointer;}
+
+.actions{margin-top:14px; min-height:90px; display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;}
+.btn{border:0; cursor:pointer; padding:14px 18px; border-radius:18px; font-weight:900; font-size:18px; box-shadow:0 14px 25px rgba(0,0,0,.14); user-select:none;}
+#yesBtn{background:linear-gradient(135deg,var(--pink),var(--pink2)); color:#fff; border:2px solid rgba(255,255,255,.66);}
+#noBtn{background:linear-gradient(135deg,#fff,#fff1f6); color:#6b2752; border:2px dashed rgba(165,92,255,.35);
+  position:fixed; left:60vw; top:55vh; z-index:10; transform-origin:center;}
+.hint{margin-top:8px; font-family:"Patrick Hand",cursive; font-size:18px; opacity:.82;}
+
+/* modal */
+.overlay{position:fixed; inset:0; z-index:50; display:none; place-items:center; padding:18px; background:rgba(10,10,18,.55); backdrop-filter:blur(10px);}
+.overlay.show{display:grid;}
+.modal{width:min(720px,100%); background:#fff; border-radius:28px; border:3px solid rgba(255,79,163,.28); box-shadow:0 30px 90px rgba(0,0,0,.35); overflow:hidden;}
+.modal .top{padding:16px 18px 10px; background:linear-gradient(135deg,#fff1f6,#fff7e8); border-bottom:2px solid rgba(255,79,163,.18);}
+.modal h2{margin:0; font-size:30px;}
+.modal .body{padding:14px 18px 18px; display:grid; gap:12px;}
+.big{font-size:64px; text-align:center;}
+.closeRow{display:flex; justify-content:center; padding:0 18px 18px;}
+.closeBtn{background:linear-gradient(135deg,var(--pink),var(--pink2)); color:#fff; border:2px solid rgba(255,255,255,.66);}
+
+/* confetti */
+.confetti{position:fixed; inset:0; z-index:60; pointer-events:none; overflow:hidden;}
+.confetti i{position:absolute; width:10px; height:14px; border-radius:3px; opacity:.95; animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(120vh) rotate(520deg); opacity:.9;}}
+
+/* error banner */
+#err{position:fixed; left:12px; right:12px; bottom:12px; z-index:99; display:none; padding:10px 12px;
+  border-radius:14px; background:rgba(0,0,0,.78); color:#fff; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px;}
+
+/* sad cat meme popup */
+.memeOverlay{position:fixed; inset:0; z-index:70; display:none; place-items:center; padding:16px;
+  background:rgba(10,10,18,.58); backdrop-filter:blur(10px);}
+.memeOverlay.show{display:grid;}
+.memeCard{width:min(860px,100%); background:#fff; border-radius:26px; border:3px solid rgba(255,79,163,.25);
+  box-shadow:0 30px 90px rgba(0,0,0,.35); overflow:hidden;}
+.memeHead{display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:14px 16px; background:linear-gradient(135deg,#fff1f6,#fff7e8); border-bottom:2px solid rgba(255,79,163,.18);}
+.memeTitle{margin:0; font-size:22px;}
+.memeClose{border:2px solid rgba(255,79,163,.22); background:rgba(255,255,255,.75); border-radius:14px; padding:8px 10px; cursor:pointer; font-weight:900;}
+.memeBody{padding:14px 16px 18px; display:grid; gap:10px;}
+.memeText{font-family:"Patrick Hand",cursive; font-size:22px; opacity:.92;}
+.memeGrid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+.memeGrid img{width:100%; height:180px; object-fit:cover; border-radius:18px; box-shadow:var(--soft); border:2px solid rgba(255,255,255,.55);}
+@media (max-width:720px){.memeGrid{grid-template-columns:repeat(2,1fr);} .memeGrid img{height:160px;}}
+@media (max-width:430px){.memeGrid{grid-template-columns:1fr;} .memeGrid img{height:170px;}}
+
+</style>
+</head>
+<body>
+<div class="collage" id="collage"></div>
+<div class="vignette"></div>
+<div class="ribbon" id="ribbon"></div>
+
+<main class="wrap">
+  <section class="card">
+    <h1>Mitch, will you be my Valentine? 💌</h1>
+    <p class="sub">Just a simple question... with a not-so-simple No button 😅</p>
+
+    <div class="musicRow"><button class="musicBtn" id="musicBtn">music: off 🎵</button></div>
+    <audio id="audio" preload="auto">
+      <source src="assets/paraluman.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="msg">Hi Babyyyy, wifeyy! I know that we are together now, and you have been giving me hints on asking you to be my valentines. So here it is po! I lovee youuuu!! And PLEASEEE SAY YESSS Pls plspslpslpslsplspsl</div>
+
+    <div class="actions">
+      <button class="btn" id="yesBtn">YES 💕</button>
+    </div>
+    <div class="hint" id="hint">Tip: try to catch "NO" if you can 😼</div>
+  </section>
+</main>
+
+<button class="btn" id="noBtn">NO</button>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="top"><h2>💘</h2></div>
+    <div class="body">
+      <div class="big">😻🎉</div>
+      <div class="msg" style="font-size:24px;">:OO THANK YOU THANK YOU I LOVEEE YOUUU SO MUCHH BABBY!\n\nsee you on Febuary 11 Babbyyy gurl!</div>
+    </div>
+    <div class="closeRow"><button class="btn closeBtn" id="closeBtn">close 💗</button></div>
+  </div>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<div class="memeOverlay" id="memeOverlay" role="dialog" aria-modal="true">
+  <div class="memeCard">
+    <div class="memeHead">
+      <h3 class="memeTitle">PLEASE WAG MO PINDUTIN ANG NO 😿</h3>
+      <button class="memeClose" id="memeClose">x</button>
+    </div>
+    <div class="memeBody">
+      <div class="memeText">Aaaa… ang sakit. 😭 (click YES na pls)</div>
+      <div class="memeGrid" id="memeGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div id="err"></div>
+
+<script>
+(function() {
+  const PHOTOS = ["assets/img/p01.jpg","assets/img/p02.jpg","assets/img/p03.jpg","assets/img/p04.jpg","assets/img/p05.jpg","assets/img/p06.jpg","assets/img/p07.jpg","assets/img/p08.jpg","assets/img/p09.jpg","assets/img/p10.jpg"];
+
+  const errBox = document.getElementById('err');
+  function showErr(msg) {
+    errBox.style.display = 'block';
+    errBox.textContent = 'ERROR: ' + msg;
+  }
+  window.addEventListener('error', (e)=> showErr(e.message));
+  window.addEventListener('unhandledrejection', (e)=> showErr(String(e.reason)));
+
+  function rand(min,max) { return Math.random()*(max-min)+min; }
+  function clamp(v,a,b) { return Math.max(a, Math.min(b, v)); }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Collage
+    const collage = document.getElementById('collage');
+    const tiles = 25;
+    for (let i=0;i<tiles;i++) {
+      const t = document.createElement('div');
+      t.className = 'tile';
+      const img = document.createElement('img');
+      img.src = PHOTOS[i % PHOTOS.length];
+      img.alt = 'photo';
+      t.appendChild(img);
+      collage.appendChild(t);
+    }
+
+    // Hearts
+    const ribbon = document.getElementById('ribbon');
+    const heartEmojis = ['💖','💘','💗','💞','💕'];
+    const heartCount = 18;
+    for (let i=0;i<heartCount;i++) {
+      const h = document.createElement('div');
+      h.className = 'heart';
+      h.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+      h.style.left = rand(2,98) + 'vw';
+      h.style.animationDuration = rand(7.5,13.5) + 's';
+      h.style.animationDelay = rand(0,7) + 's';
+      h.style.fontSize = rand(16,26) + 'px';
+      ribbon.appendChild(h);
+    }
+
+    // Music
+    const musicBtn = document.getElementById('musicBtn');
+    const audio = document.getElementById('audio');
+    let musicOn = false;
+
+    async function toggleMusic() {
+      try {
+        if (!musicOn) {
+          await audio.play();
+          musicOn = true;
+          musicBtn.textContent = 'music: on 🎶';
+        } else {
+          audio.pause();
+          musicOn = false;
+          musicBtn.textContent = 'music: off 🎵';
+        }
+      } catch (e) {
+        musicBtn.textContent = 'tap again 🎵';
+      }
+    }
+    musicBtn.addEventListener('click', toggleMusic);
+    window.addEventListener('pointerdown', async ()=> {
+      if (musicOn) return;
+      try { await audio.play(); musicOn=true; musicBtn.textContent='music: on 🎶'; } catch(e){}
+    }, { once:true });
+
+    // Buttons
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const hint = document.getElementById('hint');
+    const overlay = document.getElementById('overlay');
+    const closeBtn = document.getElementById('closeBtn');
+
+
+    // Sad cat memes (generated online via Cataas)
+    const memeOverlay = document.getElementById('memeOverlay');
+    const memeClose = document.getElementById('memeClose');
+    const memeGrid = document.getElementById('memeGrid');
+
+    const memeCaptions = [
+      "pls no 😿",
+      "wag naman 😭",
+      "sadt catto",
+      "crying inside",
+      "please YES na",
+      "don't click NO",
+      "sumasama loob ko",
+      "iyak malala",
+      "awa na lang"
+    ];
+
+    function buildMemes(){
+      if(!memeGrid) return;
+      memeGrid.innerHTML = "";
+      memeCaptions.forEach((t, idx) => {
+        const img = document.createElement('img');
+        // cache-bust so each click feels fresh
+        img.src = "https://cataas.com/cat/says/" + encodeURIComponent(t) + "?fontSize=42&fontColor=%23ff4fa3&position=middle&type=square&v=" + Date.now() + "_" + idx;
+        img.alt = t;
+        memeGrid.appendChild(img);
+      });
+    }
+
+    function openMemes(){
+      buildMemes();
+      memeOverlay.classList.add('show');
+    }
+    function closeMemes(){
+      memeOverlay.classList.remove('show');
+    }
+    memeClose.addEventListener('click', closeMemes);
+    memeOverlay.addEventListener('click', (e)=>{ if(e.target === memeOverlay) closeMemes(); });
+
+
+    let cursorX = window.innerWidth*0.6;
+    let cursorY = window.innerHeight*0.6;
+    window.addEventListener('mousemove', (e)=>{ cursorX=e.clientX; cursorY=e.clientY; }, { passive:true });
+
+    let noScale = 1.0;
+    let yesScale = 1.0;
+
+    function placeNoRandom() {
+      const rect = noBtn.getBoundingClientRect();
+      const pad = 12;
+      const x = rand(pad, window.innerWidth - rect.width - pad);
+      const y = rand(pad, window.innerHeight - rect.height - pad);
+      noBtn.style.left = x + 'px';
+      noBtn.style.top  = y + 'px';
+    }
+
+    function dodgeLoop() {
+      const rect = noBtn.getBoundingClientRect();
+      const bx = rect.left + rect.width/2;
+      const by = rect.top + rect.height/2;
+      const dx = bx - cursorX;
+      const dy = by - cursorY;
+      const dist = Math.hypot(dx,dy);
+      const trigger = 220;
+
+      if (dist < trigger) {
+        const strength = (trigger - dist) / trigger;
+        const step = 8 + 18*strength;  // slower dodge
+        const nx = (dx/(dist||1)) + rand(-0.12,0.12);
+        const ny = (dy/(dist||1)) + rand(-0.12,0.12);
+        let newLeft = (parseFloat(noBtn.style.left) || rect.left) + nx*step;
+        let newTop  = (parseFloat(noBtn.style.top)  || rect.top)  + ny*step;
+        const pad = 10;
+        newLeft = clamp(newLeft, pad, window.innerWidth - rect.width - pad);
+        newTop  = clamp(newTop,  pad, window.innerHeight - rect.height - pad);
+        noBtn.style.left = newLeft + 'px';
+        noBtn.style.top  = newTop + 'px';
+      }
+      requestAnimationFrame(dodgeLoop);
+    }
+
+    function runAround() {
+      const dir = Math.random() < 0.55 ? -1 : 1;
+      noScale = clamp(noScale + dir*rand(0.12,0.30), 0.08, 2.2);
+      noBtn.style.transform = 'scale(' + noScale + ')';
+      let hops = 0;
+      function hop() {
+        placeNoRandom();
+        hops++;
+        if (hops < 7) setTimeout(hop, 80);
+      }
+      hop();
+
+      if (noScale <= 0.18) {
+        hint.textContent = 'Where did "NO" go... 😅';
+        yesScale = clamp(yesScale + 0.14, 1.0, 3.8);
+        yesBtn.style.transform = 'scale(' + yesScale + ')';
+      } else {
+        hint.textContent = 'Try again 😼';
+      }
+    }
+
+    function sprinkleConfetti() {
+      const confetti = document.getElementById('confetti');
+      confetti.innerHTML = '';
+      const colors = ['#ff4fa3','#ff86c8','#a55cff','#72f3c5','#ffd36a','#ffffff'];
+      const pieces = 140;
+      for (let i=0;i<pieces;i++) {
+        const p = document.createElement('i');
+        p.style.left = rand(0,100) + '%';
+        p.style.top  = rand(-10,-2) + 'vh';
+        p.style.background = colors[Math.floor(Math.random()*colors.length)];
+        p.style.width = rand(6,12) + 'px';
+        p.style.height = rand(8,18) + 'px';
+        p.style.animationDuration = rand(1.8,3.4) + 's';
+        p.style.animationDelay = rand(0,0.35) + 's';
+        p.style.transform = 'rotate(' + rand(0,360) + 'deg)';
+        confetti.appendChild(p);
+      }
+      setTimeout(()=>{ confetti.innerHTML=''; }, 4200);
+    }
+
+    placeNoRandom();
+    requestAnimationFrame(dodgeLoop);
+
+    noBtn.addEventListener('click', (e)=>{ e.preventDefault(); runAround(); openMemes(); });
+    yesBtn.addEventListener('click', ()=>{ sprinkleConfetti(); overlay.classList.add('show'); });
+    closeBtn.addEventListener('click', ()=> overlay.classList.remove('show'));
+    overlay.addEventListener('click', (e)=>{ if (e.target===overlay) overlay.classList.remove('show'); });
+
+    window.addEventListener('resize', ()=> {
+      const r = noBtn.getBoundingClientRect();
+      const pad = 10;
+      noBtn.style.left = clamp(r.left, pad, window.innerWidth - r.width - pad) + 'px';
+      noBtn.style.top  = clamp(r.top,  pad, window.innerHeight - r.height - pad) + 'px';
+    });
+  });
+})();
+</script>
+</body>
+</html>
